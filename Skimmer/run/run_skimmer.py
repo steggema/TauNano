@@ -22,7 +22,7 @@ parser.add_argument('--keepdrop', action="store", dest="keepDropFile",
 args = parser.parse_args()
 
 # inFiles come as combination of comma- and/or space-separated list
-inFiles = '.'.join(args.inFiles).split(',')
+inFiles = ','.join(args.inFiles).replace("\"", "").split(',')
 inFiles = [REDIRECTOR+f if f.startswith('/store') else f for f in inFiles]
 outputDir = args.outDir
 keepDropFile = args.keepDropFile
