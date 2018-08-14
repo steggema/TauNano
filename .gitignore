@@ -1,12 +1,14 @@
 # output
 Skimmer/output/
 Skimmer/run/*.root
+*.png
 
 # grid-control
 Skimmer/grid-control/work.*/
 
 # CMSSW scram auto-generated
 Skimmer/python/__init__.py
+Analysis/python/__init__.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
