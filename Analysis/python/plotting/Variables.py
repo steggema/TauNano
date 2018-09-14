@@ -1,5 +1,5 @@
-from CMGTools.H2TauTau.proto.plotter.PlotConfigs import VariableCfg as VCfg
-from CMGTools.VVResonances.plotting.binning import eta_binning, phi_binning, pt_binning
+from InsideWTop.Plotting.PlotConfigs import VariableCfg as VCfg
+from InsideWTop.Plotting.binning import eta_binning, phi_binning, pt_binning
 from math import pi
 
 generic_vars = [

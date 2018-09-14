@@ -1,5 +1,5 @@
-from CMGTools.VVResonances.plotting.TreePlotter import TreePlotter
-from CMGTools.VVResonances.plotting.MergedPlotter import MergedPlotter
+from InsideWTop.Plotting.TreePlotter import TreePlotter
+from InsideWTop.Plotting.MergedPlotter import MergedPlotter
 import os, sys,shutil
 
 class PlotterFromFile:
@@ -20,9 +20,7 @@ class PlotterFromFile:
                         self.dataPlotters[-1].addCorrectionFactor('xsec','tree')
                         self.dataPlotters[-1].addCorrectionFactor('genWeight','tree')
                         self.dataPlotters[-1].addCorrectionFactor('puWeight','tree')
-        self.plotter=MergedPlotter(self.dataPlotters)               
-        
+        self.plotter=MergedPlotter(self.dataPlotters)
+
     def __call__(self):
         return self.plotter
-    
-    

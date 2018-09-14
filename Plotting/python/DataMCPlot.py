@@ -4,11 +4,11 @@ import fnmatch
 
 from ROOT import TLegend, TLine, TPad, TFile, gROOT, TH1
 
-from CMGTools.RootTools.DataMC.Histogram import Histogram
-from CMGTools.RootTools.DataMC.Stack import Stack
+from InsideWTop.Plotting.Histogram import Histogram
+from InsideWTop.Plotting.Stack import Stack
 
 # from CMGTools.H2TauTau.proto.plotter.H2TauStyle import histPref, Style
-from CMGTools.VVResonances.plotting.VVStyle import histPref, Style
+from InsideWTop.Analysis.plotting.VVStyle import histPref, Style
 
 
 def ymax(hists):

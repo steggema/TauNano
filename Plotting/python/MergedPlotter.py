@@ -2,7 +2,7 @@ import ROOT
 import sys
 from array import array
 import pickle
-from CMGTools.VVResonances.plotting.PlotterBase import PlotterBase
+from InsideWTop.Plotting.PlotterBase import PlotterBase
 class MergedPlotter(PlotterBase):
 
     def __init__(self,plotters):
@@ -120,4 +120,3 @@ class MergedPlotter(PlotterBase):
         for i in range(1,len(self.plotters)):
             data.append(self.plotters[i].makeDataSet(var,cut,maxN))
         return data
-    

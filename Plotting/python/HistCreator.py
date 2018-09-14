@@ -1,13 +1,13 @@
 import pickle
 
 # Adds MultiDraw method to ROOT.TTree
-import CMGTools.H2TauTau.proto.plotter.MultiDraw
+import InsideWTop.Plotting.MultiDraw
 
-from CMGTools.H2TauTau.proto.plotter.PlotConfigs import HistogramCfg
-from CMGTools.VVResonances.plotting.DataMCPlot import DataMCPlot
+from InsideWTop.Plotting.PlotConfigs import HistogramCfg
+from InsideWTop.Plotting.DataMCPlot import DataMCPlot
 
 
-from CMGTools.RootTools.DataMC.Histogram import Histogram
+from InsideWTop.Plotting.Histogram import Histogram
 
 from ROOT import TH1F, TGraphAsymmErrors, Math, kBlack
 

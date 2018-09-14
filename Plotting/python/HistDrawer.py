@@ -5,11 +5,11 @@ import copy
 from math import log10, floor, pow
 
 from ROOT import TCanvas, TPaveText, TBox, gStyle
-from CMGTools.RootTools.DataMC.Stack import Stack
+from InsideWTop.Plotting.Stack import Stack
 
-from CMGTools.H2TauTau.proto.plotter.CMS_lumi import CMS_lumi
+from InsideWTop.Analysis.CMS_lumi import CMS_lumi
 
-from CMGTools.H2TauTau.proto.plotter.officialStyle import officialStyle
+from InsideWTop.Plotting.officialStyle import officialStyle
 officialStyle(gStyle)
 gStyle.SetLegendBorderSize(0)
 
