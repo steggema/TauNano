@@ -1,7 +1,4 @@
 drop *
-keep LHE*
-keep GenJet_*
-keep genWeight*
 keep luminosityBlock*
 keep run*
 keep event*
