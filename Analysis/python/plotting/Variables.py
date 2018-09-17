@@ -3,11 +3,11 @@ from InsideWTop.Plotting.binning import eta_binning, phi_binning, pt_binning
 from math import pi
 
 generic_vars = [
-    VCfg(name='_norm_', drawname='1.', binning={'nbinsx':5, 'xmin':-1.5, 'xmax':3.5}, unit='', xtitle='Normalisation'),
-    VCfg(name='Flag_goodVertices', binning={'nbinsx':5, 'xmin':-1.5, 'xmax':3.5}, unit='', xtitle='Flag_goodVertices'),
-    VCfg(name='nVert', binning={'nbinsx':60, 'xmin':0, 'xmax':60}, unit='', xtitle='N primary vertices'),
-    VCfg(name='met_pt', binning=pt_binning, unit='GeV', xtitle='MET'),
-    VCfg(name='met_phi', binning=phi_binning, unit='', xtitle='MET #phi'),
+    # VCfg(name='_norm_', drawname='1.', binning={'nbinsx':5, 'xmin':-1.5, 'xmax':3.5}, unit='', xtitle='Normalisation'),
+    # VCfg(name='Flag_goodVertices', binning={'nbinsx':5, 'xmin':-1.5, 'xmax':3.5}, unit='', xtitle='Flag_goodVertices'),
+    # VCfg(name='nVert', binning={'nbinsx':60, 'xmin':0, 'xmax':60}, unit='', xtitle='N primary vertices'),
+    VCfg(name='MET_pt', binning=pt_binning, unit='GeV', xtitle='MET'),
+    # VCfg(name='met_phi', binning=phi_binning, unit='', xtitle='MET #phi'),
 ]
 
 jj_generic_vars = [

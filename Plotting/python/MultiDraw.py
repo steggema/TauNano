@@ -35,7 +35,7 @@ def MultiDraw(self, Formulae, CommonWeight="1"):
         MyTree.Draw( "nlcts >> a(100, -1, 1)", "weightA" )
         MyTree.Draw( "nlcts >> b(100, -1, 1)", "weightB" )
 
-        Do:    
+        Do:
         MyTree.MultiDraw( ( "nlcts >> a(100, -1, 1)", "weightA" ),
                           ( "nlcts >> b(100, -1, 1)", "weightB" ) )
 
@@ -43,9 +43,9 @@ def MultiDraw(self, Formulae, CommonWeight="1"):
         The first parameter, CommonWeight, decides a weight given to all
         histograms.
 
-        An arbitrary number of additional histograms may be specified. They can 
-        either be specified with just a string containing the formula to be 
-        drawn, the histogram name and bin configuration. 
+        An arbitrary number of additional histograms may be specified. They can
+        either be specified with just a string containing the formula to be
+        drawn, the histogram name and bin configuration.
 
         Alternatively it can be a tuple, with  said string, and an additional
         string specifying the weight to be applied to that histogram only.
@@ -144,8 +144,8 @@ def MultiDraw(self, Formulae, CommonWeight="1"):
         from ROOT import MultiDraw as _MultiDraw
     except ImportError:
         # gROOT.ProcessLine(".L %sMultiDraw.cxx+O" % "./")
-        if "/sMultiDraw_cc.so" not in gSystem.GetLibraries(): 
-            gROOT.ProcessLine(".L %s/src/CMGTools/H2TauTau/python/proto/plotter/MultiDraw.cc+" % os.environ['CMSSW_BASE']);
+        if "/sMultiDraw_cc.so" not in gSystem.GetLibraries():
+            gROOT.ProcessLine(".L %s/src/InsideWTop/Plotting/python/MultiDraw.cc+" % os.environ['CMSSW_BASE']);
         from ROOT import MultiDraw as _MultiDraw
 
     # from time import time

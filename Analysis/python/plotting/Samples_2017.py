@@ -6,7 +6,7 @@ from InsideWTop.Plotting.PlotConfigs import SampleCfg
 from InsideWTop.Plotting.HistCreator import setSumWeights
 
 
-from InsideWTop.Plotting.samples_13TeV_RunIIFall17MiniAOD import QCDHT, QCDPt, VJetsQQHT, TTHad_pow
+from InsideWTop.Plotting.samples.RunIISummer16NanoAOD import TT
 # from CMGTools.RootTools.samples.samples_13TeV_DATA2017 import *
 # from CMGTools.VVResonances.samples.signal_13TeV_94X_Fall17 import signalSamples
 # from CMGTools.VVResonances.samples.signal_13TeV_94X_Fall17_private import signalSamples_private
@@ -61,7 +61,7 @@ def createSampleLists(analysis_dir='samples/',
     # explicit list of samples:
     wjetsSampleNames = ["WJetsToQQ_HT800toInf"]
     dyjetsSampleNames = ['ZJetsToQQ_HT800toInf']
-    ttjetsSampleNames = ["TTHad_pow"]
+    ttjetsSampleNames = ["TT_TuneCUETP8M2T4_13TeV-powheg-pythia8"]
     qcdSampleNames = ['QCD_HT100to200', 'QCD_HT200to300', 'QCD_HT300to500', 'QCD_HT500to700', 'QCD_HT700to1000', 'QCD_HT1000to1500', 'QCD_HT1500to2000', 'QCD_HT2000toInf']
     # vvSampleNames = ['WWTo1L1Nu2Q', 'WWTo1L1Nu2Q', 'WZTo1L1Nu2Q']
     # singleTopSampleNames = ['Ttch_powheg', 'TBar_tch_powheg', 'TToLeptons_sch', 'TBar_tWch', 'T_tWch']
@@ -72,7 +72,7 @@ def createSampleLists(analysis_dir='samples/',
     # if useWJetsPt:
     #     wjetsSampleNames = ["WJetsToLNu_Pt_100To250", "WJetsToLNu_Pt_250To400", "WJetsToLNu_Pt_400To600", "WJetsToLNu_Pt_600ToInf"]
 
-    jj_SampleNames = qcdSampleNames + wjetsSampleNames + dyjetsSampleNames + ttjetsSampleNames
+    jj_SampleNames = ttjetsSampleNames # + qcdSampleNames + wjetsSampleNames + dyjetsSampleNames
     # cuts to split ttbar sample according to W decay
     # ttjetsWCut = '(lnujj_l2_mergedVTruth==1&&lnujj_l2_nearestBDRTruth>0.8)'
     # ttjetsNonWCut = '(!(lnujj_l2_mergedVTruth==1&&lnujj_l2_nearestBDRTruth>0.8))'
@@ -94,7 +94,7 @@ def createSampleLists(analysis_dir='samples/',
     # from ROOT import getDYWeight, getWWeight
 
     # add samples
-    for sample in QCDHT + QCDPt + VJetsQQHT + [TTHad_pow]:
+    for sample in [TT]:
         vJetsWeight = "1."  # str(vJetsKFac)
         if sample.name in channelSampleNames:
             if sample.name in qcdSampleNames:
@@ -111,7 +111,7 @@ def createSampleLists(analysis_dir='samples/',
             #     vJetsWeight = 'getWWeight(truth_genBoson_pt) * {} * {}'.format(vJetsKFac, wJetsQCDCorrections2015[sample.name])
             samples_essential.append(
                 SampleCfg(name=sample.name, dir_name=sample.name, ana_dir=analysis_dir, tree_prod_name=tree_prod_name,
-                    xsec=sample.xSection, sumweights=sample.nGenEvents, weight_expr=('*'.join([weight, vJetsWeight]))))
+                    xsec=sample.xSection, weight_expr=('*'.join([weight, vJetsWeight]))))
 
     # # TTJets sample
     # for sample in topSamples:
@@ -136,30 +136,32 @@ def createSampleLists(analysis_dir='samples/',
     samples_data = []
     if channel == 'WV':
         samples_data = [
-            SampleCfg(name='data_SingleMuon', dir_name='SingleMuon_Run2016B_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_SingleMuon', dir_name='SingleMuon_Run2016C_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_SingleMuon', dir_name='SingleMuon_Run2016D_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_SingleMuon', dir_name='SingleMuon_Run2016E_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_SingleMuon', dir_name='SingleMuon_Run2016F_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_SingleMuon', dir_name='SingleMuon_Run2016G_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_SingleMuon', dir_name='SingleMuon_Run2016H_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_SingleMuon', dir_name='SingleMuon_Run2016H_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_SingleElectron', dir_name='SingleElectron_Run2016B_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_SingleElectron', dir_name='SingleElectron_Run2016C_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_SingleElectron', dir_name='SingleElectron_Run2016D_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_SingleElectron', dir_name='SingleElectron_Run2016E_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_SingleElectron', dir_name='SingleElectron_Run2016F_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_SingleElectron', dir_name='SingleElectron_Run2016G_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_SingleElectron', dir_name='SingleElectron_Run2016H_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_SingleElectron', dir_name='SingleElectron_Run2016H_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_MET', dir_name='MET_Run2016B_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_MET', dir_name='MET_Run2016C_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_MET', dir_name='MET_Run2016D_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_MET', dir_name='MET_Run2016E_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_MET', dir_name='MET_Run2016F_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_MET', dir_name='MET_Run2016G_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_MET', dir_name='MET_Run2016H_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
-            SampleCfg(name='data_MET', dir_name='MET_Run2016H_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_SingleMuon', dir_name='SingleMuon_Run2016B-05Feb2018_ver1-v1', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_SingleMuon', dir_name='SingleMuon_Run2016B-05Feb2018_ver2-v1', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_SingleMuon', dir_name='SingleMuon_Run2016C-05Feb2018-v1', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_SingleMuon', dir_name='SingleMuon_Run2016D-05Feb2018-v1', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_SingleMuon', dir_name='SingleMuon_Run2016E-05Feb2018-v1', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_SingleMuon', dir_name='SingleMuon_Run2016F-05Feb2018-v1', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_SingleMuon', dir_name='SingleMuon_Run2016G-05Feb2018-v1', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_SingleMuon', dir_name='SingleMuon_Run2016H-05Feb2018_ver2-v1', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_SingleMuon', dir_name='SingleMuon_Run2016H-05Feb2018_ver3-v1', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_SingleElectron', dir_name='SingleElectron_Run2016B-05Feb2018_ver1-v2', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_SingleElectron', dir_name='SingleElectron_Run2016B-05Feb2018_ver2-v2', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_SingleElectron', dir_name='SingleElectron_Run2016C-05Feb2018-v2', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_SingleElectron', dir_name='SingleElectron_Run2016D-05Feb2018-v2', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_SingleElectron', dir_name='SingleElectron_Run2016E-05Feb2018-v2', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_SingleElectron', dir_name='SingleElectron_Run2016F-05Feb2018-v2', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_SingleElectron', dir_name='SingleElectron_Run2016G-05Feb2018-v2', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_SingleElectron', dir_name='SingleElectron_Run2016H-05Feb2018_ver2-v2', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            SampleCfg(name='data_SingleElectron', dir_name='SingleElectron_Run2016H-05Feb2018_ver3-v2', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            # SampleCfg(name='data_MET', dir_name='MET_Run2016B_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            # SampleCfg(name='data_MET', dir_name='MET_Run2016C_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            # SampleCfg(name='data_MET', dir_name='MET_Run2016D_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            # SampleCfg(name='data_MET', dir_name='MET_Run2016E_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            # SampleCfg(name='data_MET', dir_name='MET_Run2016F_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            # SampleCfg(name='data_MET', dir_name='MET_Run2016G_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            # SampleCfg(name='data_MET', dir_name='MET_Run2016H_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
+            # SampleCfg(name='data_MET', dir_name='MET_Run2016H_17Nov2017', ana_dir=analysis_dir, tree_prod_name=tree_prod_name, is_data=True),
         ]
     else:
         samples_data = [

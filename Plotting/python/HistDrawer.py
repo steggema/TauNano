@@ -7,7 +7,7 @@ from math import log10, floor, pow
 from ROOT import TCanvas, TPaveText, TBox, gStyle
 from InsideWTop.Plotting.Stack import Stack
 
-from InsideWTop.Analysis.CMS_lumi import CMS_lumi
+from InsideWTop.Plotting.CMS_lumi import CMS_lumi
 
 from InsideWTop.Plotting.officialStyle import officialStyle
 officialStyle(gStyle)

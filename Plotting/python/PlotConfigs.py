@@ -26,20 +26,20 @@ class SampleCfg(object):
     '''Configuration object for a sample contribution within a histogram.
     If specific properties are empty, overall defaults will be assumed.
     '''
-    def __init__(self, name='Default', dir_name=None, ana_dir='', 
+    def __init__(self, name='Default', dir_name=None, ana_dir='',
         tree_prod_name='H2TauTauTreeProducerTauMu', tree_name=None,
-        scale=1., weight_expr=None, norm_cut=None, shape_cut=None, 
+        scale=1., weight_expr=None, norm_cut=None, shape_cut=None,
         xsec=1., sumweights=1., is_signal=False, is_data=False,
         cut_replace_func=None):
         self.name = name
         self.dir_name = name if dir_name is None else dir_name
         self.ana_dir = ana_dir
         self.tree_prod_name = tree_prod_name
-        self.tree_name = 'tree' if tree_name is None else tree_name
+        self.tree_name = 'Events' if tree_name is None else tree_name
         self.scale = scale # generic scale, e.g. scale signal by factor 5
         # a sample-specific weight expression (e.g. extra cut)),
         # multiplied with the overall histogram weight
-        self.weight_expr = weight_expr 
+        self.weight_expr = weight_expr
         self.norm_cut = norm_cut
         self.shape_cut = shape_cut
         self.cut_replace_func = cut_replace_func
@@ -54,7 +54,7 @@ class SampleCfg(object):
 class HistogramCfg(object):
     '''Configuration object for a histogram made up of several sub-contributions.
 
-    A histogram can in turn have a sub-contribution from another histogram cfg. 
+    A histogram can in turn have a sub-contribution from another histogram cfg.
     '''
     def __init__(self, name='Default', var=None, vars=None, cfgs=None, cut='', lumi=1.,
                  weight='weight', norm_cfg=None, use_signal_for_stack=False,
@@ -68,8 +68,7 @@ class HistogramCfg(object):
         self.weight = weight
         self.use_signal_for_stack = use_signal_for_stack
 
-        # The following two parameters are only used if this is used as a 
+        # The following two parameters are only used if this is used as a
         # sub-contribution in a different histogram
         self.norm_cfg = norm_cfg # Different histogram cfg for normalisation
         self.total_scale = total_scale
-
