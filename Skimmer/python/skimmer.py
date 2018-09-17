@@ -1,79 +1,41 @@
 """
-This is a loose selection to select events for T Tbar semileptonic events where
-Type 1 and Type 2 events are included in the selection:
-
-In SF code the final cuts need to be made to choose either type 1 or type 2 selection:
-e.g. for type 1 the W leptonic Pt cut should be tightened to 200 GeV and dPhi cuts applied
-e.g. for type 2 the AK8 Pt cut should be tightened to 400 GeV and dPhi cuts applied
-
-Type 1 - martially merged Hadronic Top Quark (W is AK8, b is AK4)
-(AK8 Pt > 200 GeV)
-
-Type 2 - fully merged Top (Top is AK8, W is most massive SD subjet, b is less massive subjet, require 1 subjet b-tag)
-(AK8 Pt > 400 GeV):
-
-
-selection aligned with previous SF measurement standard selection
-https://www.evernote.com/shard/s282/sh/7e5d6baa-d100-4025-8bf8-a61bf1adfbc1/f7e86fde2c2a165e
-
-1 AK8 Pt > 200 GeV, |eta| < 2.5 , dR(Ak8, lep) > 1.0
-1 AK4 Pt > 30 GeV, |eta| < 2.5
-1 lepton , mu pt > 53 GeV or el pt > 120 GeV
-MET Pt > 40(mu) or 80(el) GeV
-Leptonic W - lepton + MET has Pt > 150 GeV # did not apply this since we are missing MET eta
+Generic mu-tau and dimuon selection for tau analyses.
 """
 
 # pylint: disable=E0401,E0402,C0103,C0413
+
+from itertools import permutations, product
+
 import ROOT
 ROOT.PyConfig.IgnoreCommandLineOptions = True
 
-from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object
+from PhysicsTools.NanoAODTools.postprocessing.tools import deltaR2
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
-from PhysicsTools.NanoAODTools.postprocessing.tools import *
+from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object
+from InsideWTop.Skimmer.tools import calcMT, calcPzetaVars
 
-import random
-import array
-
+DEFAULT = -999
 
 class Skimmer(Module):
-    def __init__(self, Channel):
-        self.chan = Channel
+    def __init__(self, is_data=False):
+        self.out = None
         self.writeHistFile = True
-        self.verbose = False
 
-        self.minMupt = 53.
-        self.maxMuEta = 2.4
-        self.maxRelIso = 0.1
-        self.minMuMETPt = 40.
+        # Use naming conventions for HTT sync ntuples
+        self.basic_branch_names = ['pt', 'eta', 'phi', 'm', 'q', 'd0', 'dz', 'mt', 'dxy', 'dz'] #FIXME: int vars, like gen_match
+        if not is_data:
+            self.basic_branch_names.append('gen_match')
+        self.tau_branch_names = ['puCorr', 'rawAntiEle', 'rawIso', 'rawIsodR03', 'rawMVAnewDM2017v2', 'rawMVAoldDM', 'rawMVAoldDM2017v1', 'rawMVAoldDM2017v2', 'rawMVAoldDMdR032017v2', 'decayMode', 'idAntiEle', 'idAntiMu', 'idDecayMode', 'idMVAnewDM2017v2', 'idMVAoldDM', 'idMVAoldDM2017v1', 'idMVAoldDM2017v2', 'idMVAoldDMdR032017v2']
+        self.muon_branch_names = [] if is_data else ['effSF']
 
-        # remove  AK8 jet within 1.0 of lepton
-        self.mindRLepJet = 1.0
+        self.translater = {
+            'm':'mass',
+            'q':'charge',
+            'd0':'dxy',
+            'gen_match':'genPartFlav',
+        }
 
-        self.minElpt = 120.
-        self.minElMETPt = 80.
-
-        self.minLepWPt = 150.
-
-        self.minJetPt = 200.
-        self.maxJetEta = 2.5
-
-        self.minBDisc = 0.8484
-        # Medium https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation80XReReco
-
-        # >= 1 CSVmedium akt4 jet
-        self.minAK4Pt = 30.
-
-        # Angular selection (to be implemented later, in fitting code):
-        # dR( lepton, leading AK8 jet) > pi/2
-        # dPhi(leading AK8 jet, MET) > 2
-        # dPhi (leading AK8 jet, leptonic W) >2
-        # self.minDPhiWJet = 2.
-
-        self.Vlep_type = -1
-        self.matchedJ = 0
-        self.matchedSJ = 0
-        self.SJ0isW = -1
-        self.isW = 0
+        self.no_reset_branches = ['nMuon', 'nElectron', 'Muon_effSF', 'Electron_effSF']
 
     def beginJob(self, histFile, histDirName):
         Module.beginJob(self, histFile, histDirName)
@@ -81,289 +43,169 @@ class Skimmer(Module):
 
     def endJob(self):
         Module.endJob(self)
-        pass
 
     def beginFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         self.out = wrappedOutputTree
-        self.out.branch("dr_LepJet", "F")
-        self.out.branch("dphi_LepJet", "F")
-        self.out.branch("dphi_MetJet", "F")
-        self.out.branch("dphi_WJet", "F")
-        self.out.branch("SelectedJet_softDrop_mass", "F")
-        self.out.branch("SelectedJet_tau32", "F")
-        self.out.branch("SelectedJet_tau21", "F")
-        self.out.branch("SelectedJet_tau21_ddt", "F")
-        self.out.branch("SelectedJet_tau21_ddt_retune", "F")
-        self.out.branch("SelectedJet_pt", "F")
-        self.out.branch("SelectedJet_eta", "F")
-        self.out.branch("SelectedJet_mass", "F")
-        self.out.branch("SelectedLepton_pt", "F")
-        self.out.branch("SelectedMuon_iso", "F")
-        self.out.branch("Wlep_type", "I")
-        self.out.branch("W_pt", "F")
-        self.out.branch("MET", "F")
-        self.out.branch("genmatchedAK8Subjet", "I")
-        self.out.branch("AK8Subjet0isMoreMassive", "I")
-        self.out.branch("genmatchedAK8", "I")
-        self.out.branch("crossection", "F")
         self.out.branch("passedMETfilters", "I")
+
+        # Counting variables
+        self.out.branch("nSelMuons", "I")
+        self.out.branch("nSelTaus", "I")
+
+        for b_name in self.basic_branch_names:
+            for i_obj in ['1', '2', '3']:
+                self.out.branch('_'.join([b_name, i_obj]), "F")
+
+        for b_name in self.tau_branch_names:
+            for i_obj in ['2', '3']:
+                self.out.branch('_'.join([b_name, i_obj]), "F")
+
+        for b_name in self.muon_branch_names:
+            for i_obj in ['1', '2']:
+                self.out.branch('_'.join([b_name, i_obj]), "F")
+
+        self.out.branch("mvis", "F")
+        self.out.branch("ptvis", "F")
+        self.out.branch("pzeta_vis", "F")
+        self.out.branch("pzeta_met", "F")
+        self.out.branch("pzeta_disc", "F")
 
     def endFile(self, inputFile, outputFile, inputTree, wrappedOutputTree):
         pass
 
-    def getSubjets(self, p4, subjets, dRmax=0.8):
-        ret = []
-        for subjet in subjets:
-            if p4.DeltaR(subjet.p4()) < dRmax and len(ret) < 2:
-                ret.append(subjet.p4())
-        return ret
+    def fillBasic(self, particle, p_i):
+        for var in self.basic_branch_names:
+            self.out.fillBranch('{}_{}'.format(var, p_i), getattr(particle, self.translate(var)))
 
-    def printP4(self, c):
-        if hasattr(c, "p4"):
-            s = ' %6.2f %5.2f %5.2f %6.2f ' % (c.p4().Perp(), c.p4().Eta(), c.p4().Phi(), c.p4().M())
-        else:
-            s = ' %6.2f %5.2f %5.2f %6.2f ' % (c.Perp(), c.Eta(), c.Phi(), c.M())
-        return s
+    def fillMuon(self, particle, p_i):
+        for var in self.muon_branch_names:
+            self.out.fillBranch('{}_{}'.format(var, p_i), getattr(particle, self.translate(var)))
 
-    def printCollection(self, coll):
-        for ic, c in enumerate(coll):
-            s = self.printP4(c)
-            print ' %3d : %s' % (ic, s)
+    def fillTau(self, particle, p_i):
+        for var in self.tau_branch_names:
+            self.out.fillBranch('{}_{}'.format(var, p_i), getattr(particle, self.translate(var)))
+
+    def translate(self, name):
+        try:
+            return self.translater[name]
+        except KeyError:
+            return name
+
+    def fillMETFilterDecision(self, event):
+        passedMETFilters = False
+        # Add filters https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#Moriond_2018
+        filter_names = ["Flag_BadChargedCandidateFilter", "Flag_BadPFMuonFilter", "Flag_EcalDeadCellTriggerPrimitiveFilter", "Flag_HBHENoiseFilter", "Flag_HBHENoiseIsoFilter", "Flag_METFilters", "Flag_ecalBadCalibFilter", "Flag_globalTightHalo2016Filter", "Flag_goodVertices"]
+        if all(getattr(event, filter_name) for filter_name in filter_names):
+            passedMETFilters = True
+        self.out.fillBranch("passedMETfilters", passedMETFilters)
+
+    @staticmethod
+    def isMuon(muon):
+        return hasattr(muon, 'mediumId')
+
+    @staticmethod
+    def isTau(tau):
+        return hasattr(tau, 'decayMode')
+
+    @staticmethod
+    def selectMuon(muon):
+        '''Select muon passing analysis criteria
+        '''
+        muon.iso = -muon.pfRelIso03_all
+        return muon.pt > 29. and abs(muon.eta) < 2.4 and muon.mediumId and muon.pfRelIso03_all < 0.15
+
+    @staticmethod
+    def selectTau(tau):
+        '''Select muon passing analysis criteria, without isolation
+        '''
+        tau.iso = tau.rawMVAoldDM2017v2
+        return tau.pt > 20. and abs(tau.eta) < 2.3 and tau.idDecayMode and tau.dz < 0.2
+
+    @staticmethod
+    def bestPair(pairs):
+        least_iso_highest_pt = lambda cand1, cand2: (-cand1.iso, -cand1.pt, -cand2.iso, -cand2.pt)
+
+        return sorted(pairs, key=lambda pair: least_iso_highest_pt(pair[0], pair[1]))[0]
 
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
-        weight = 1.0
-        isMC = event.run == 1
 
-        # Gen
-        if isMC:
-            # Look at generator level particles
-            # find events where :
-            # a W decays to quarks (Type 1 - partially merged)
-            #    OR
-            # a Top decays to W + b (Type 2 - fully merged top quark)
-            gens = Collection(event, "GenPart")
-            Wdaus = [x for x in gens if x.pt > 1 and 0 < abs(x.pdgId) < 9]
-            Wmoms = [x for x in gens if x.pt > 10 and abs(x.pdgId) == 24]
+        self.fillMETFilterDecision(event)
 
-            TWdaus = [x for x in gens if x.pt > 1 and 0 < abs(x.pdgId) < 4]
-            Tdaus = [x for x in gens if x.pt > 1 and (abs(x.pdgId) == 5 or abs(x.pdgId) == 24)]
-            Tmoms = [x for x in gens if x.pt > 10 and abs(x.pdgId) == 6]
-
-            realVs = []
-            realVdaus = []
-
-            realTs = []
-            realWs = []
-            realqs = []
-            self.matchedJ = 0
-            self.matchedSJ = 0
-
-            if len(Wmoms) > 0 and len(Wdaus) > 0:
-                for dau in Wdaus:
-                    for mom in Wmoms:
-                        try:
-                            if mom == Wmoms[dau.genPartIdxMother]:
-                                realVs.append(mom)
-                                realVdaus.append(dau)
-                        except:
-                            continue
-
-            if len(Tmoms) > 0 and len(Tdaus) > 0:
-                for gdau in TWdaus:
-                    for dau in Tdaus:
-                        for mom in Tmoms:
-                            try:
-                                if mom == Tmoms[dau.genPartIdxMother] and dau == Tdaus[gdau.genPartIdxMother]:
-                                    realTs.append(mom)
-                                    realWs.append(dau)
-                                    realqs.append(gdau)
-                            except:
-                                continue
-
-        # Find high-pT lepton, veto additional leptons, check trigger
-        allmuons = Collection(event, "Muon")
-        allelectrons = Collection(event, "Electron")
-        if self.chan == "mu":
-            triggerMu = event.HLT_Mu50
-            triggerEl = 0
-        elif self.chan == "el":
-            triggerEl = event.HLT_Ele115_CaloIdVT_GsfTrkIdT
-            triggerMu = 0
-        elif self.chan == "elmu":
-            triggerEl = event.HLT_Ele115_CaloIdVT_GsfTrkIdT
-            triggerMu = event.HLT_Mu50
-        else:
-            print "Channel not defined! Skipping"
-            return False
-
-        electrons = [x for x in allelectrons if x.cutBased_HEEP and x.pt > 35]	 # loose pt cut for veto
-        muons = [x for x in allmuons if x.pt > 20 and x.highPtId > 1 and abs(x.p4().Eta()) < self.maxMuEta and x.pfRelIso03_all < 0.1]  # loose pt cut for veto
+        # MUONS
+        muons = Collection(event, 'Muon')
+        muons = [muon for muon in muons if self.selectMuon(muon)]
         muons.sort(key=lambda x: x.pt, reverse=True)
-        electrons.sort(key=lambda x: x.pt, reverse=True)
 
-        self.Vlep_type = -1
-        lepton = ROOT.TLorentzVector()
-        if len(electrons) + len(muons) == 1:
-            if len(muons) == 1:
-                if triggerMu == 0:
-                    return False
-                if muons[0].pt < self.minMupt:
-                    return False
-                self.Vlep_type = 0
-                lepton = muons[0].p4()
-
-            if len(electrons) == 1:
-                if triggerEl == 0:
-                    return False
-                if electrons[0].pt < self.minElpt:
-                    return False
-                self.Vlep_type = 1
-                lepton = electrons[0].p4()
-        else:
+        # At least one muon
+        if not muons:
             return False
 
-        iso = 0.
-        if self.chan.find("mu") != -1 and muons:
-            iso = muons[0].pfRelIso03_all
-        # Add filters https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#Moriond_2018
-        passedMETFilters = False
-        try:
-            if event.Flag_BadChargedCandidateFilter and event.Flag_BadPFMuonFilter and event.Flag_EcalDeadCellTriggerPrimitiveFilter and event.Flag_HBHENoiseFilter and event.Flag_HBHENoiseIsoFilter and event.Flag_METFilters and event.Flag_ecalBadCalibFilter and event.Flag_globalTightHalo2016Filter and event.Flag_goodVertices:
-                passedMETFilters = True
-        except:
-            passedMETFilters = False
-        # if not passedMETFilters: return False
+        taus = Collection(event, 'Tau')
+        taus = [tau for tau in taus if self.selectTau(tau)]
+        taus = [tau for tau in taus if not any(deltaR2(tau, muon) < 0.25 for muon in muons)]
 
-        # Apply MET cut
-        met = Object(event, "MET")
-        if self.Vlep_type == 0 and met.sumEt < self.minMuMETPt:
-            return False
-        if self.Vlep_type == 1 and met.sumEt < self.minElMETPt:
-            return False
-        MET = ROOT.TLorentzVector()
-        MET.SetPtEtaPhiE(met.sumEt, 0., met.phi, met.sumEt)
+        all_pairs = []
+        if len(muons) > 1:
+            all_pairs = [mumu for mumu in permutations(muons, 2)]
+        else: # 1 muon
+            all_pairs = [mutau for mutau in product(muons, taus)]
 
-        # Apply leptonic W cut
-        WcandLep = lepton + MET
-        # if WcandLep.Perp() < self.minLepWPt :
-        #     return False
-
-        # Check for additional b-jet in the event, apply CSV later!
-        Jets = list(Collection(event, "Jet"))
-        recoAK4 = [x for x in Jets if x.p4().Perp() > self.minAK4Pt and abs(x.p4().Eta()) < self.maxJetEta and x.btagCSVV2 > self.minBDisc]
-        if len(recoAK4) < 1:
+        # At least one pair, either mu-mu or mu-tau
+        if not all_pairs:
             return False
 
-        # Find fat jet
-        FatJets = list(Collection(event, "FatJet"))
-        recoAK8 = [x for x in FatJets if x.p4().Perp() > self.minJetPt and abs(x.p4().Eta()) < self.maxJetEta and x.msoftdrop > 30. and x.tau1 > 0. and x.tau2 > 0.]
-        if len(recoAK8) < 1:
-            return False
-        recoAK8.sort(key=lambda x: x.msoftdrop, reverse=True)
+        # Reset branch entries
+        for branch_name in self.out._branches:
+            if branch_name not in self.no_reset_branches:
+                self.out.fillBranch(branch_name, DEFAULT)
 
-        jetAK8_4v = ROOT.TLorentzVector()
-        jetAK8_4v.SetPtEtaPhiM(recoAK8[0].pt, recoAK8[0].eta, recoAK8[0].phi, recoAK8[0].mass)
+        best_pair = self.bestPair(all_pairs)
 
-        # No lepton overlap
-        dR_jetlep = jetAK8_4v.DeltaR(lepton)
-        if abs(dR_jetlep) < self.mindRLepJet:
-            return False
+        l1 = best_pair[0]
+        l2 = best_pair[1]
 
-        # Check if matched to genW and genW daughters
-        # for partially merged:
-        self.isW = 0
-        if isMC == False:
-            genjets = [None] * len(recoAK8)
+        # If two muons, sort pair by pT
+        if self.isMuon(l2):
+            if l2.pt > l1.pt:
+                best_pair = (l2, l1)
 
-        else:
-            for V in realVs:
-                gen_4v = ROOT.TLorentzVector()
-                gen_4v.SetPtEtaPhiM(V.pt, V.eta, V.phi, V.mass)
-                dR = jetAK8_4v.DeltaR(gen_4v)
-                if dR < 0.8:
-                    nDau = 0
-                    for v in realVdaus:
-                        gen_4v = ROOT.TLorentzVector()
-                        gen_4v.SetPtEtaPhiM(v.pt, v.eta, v.phi, v.mass)
-                        dR = jetAK8_4v.DeltaR(gen_4v)
-                        if dR < 0.8:
-                            nDau += 1
-                    if nDau > 1:
-                        self.isW = 1
-                    else:
-                        self.isW = 0
+        mvis = (l1.p4() + l2.p4()).M()
+        pt_vis = (l1.p4() + l2.p4()).Pt()
 
-        # for fully merged:
-        self.SJ0isW = -1
-        # List of reco subjets:
-        recosubjets = list(Collection(event, "SubJet"))
-        # Dictionary to hold ungroomed-->groomed for reco
-        recoAK8Groomed = {}
-        # Get the groomed reco jets
-        maxrecoSJmass = 1.
-        WHadreco = None
-        for ireco, reco in enumerate(recoAK8):
-            if reco.subJetIdx2 >= len(recosubjets) or reco.subJetIdx1 >= len(recosubjets):
-                if self.verbose: print "Reco subjet indices not in Subjet list, Skipping"
-                continue
-            if reco.subJetIdx1 >= 0 and reco.subJetIdx2 >= 0 :
-                recoAK8Groomed[reco] = recosubjets[reco.subJetIdx1].p4() + recosubjets[reco.subJetIdx2].p4()
-                if recosubjets[reco.subJetIdx1].p4().M() > maxrecoSJmass and recosubjets[reco.subJetIdx1].p4().M() > recosubjets[reco.subJetIdx2].p4().M():
-                    maxrecoSJmass = recosubjets[reco.subJetIdx1].p4().M()
-                    WHadreco = recosubjets[reco.subJetIdx1].p4()
-                    if recosubjets[reco.subJetIdx1].btagCSVV2 > self.minBDisc or recosubjets[reco.subJetIdx2].btagCSVV2 > self.minBDisc:
-                        self.SJ0isW = 1
-                if recosubjets[reco.subJetIdx2].p4().M() > maxrecoSJmass and recosubjets[reco.subJetIdx1].p4().M() < recosubjets[reco.subJetIdx2].p4().M():
-                    maxrecoSJmass = recosubjets[reco.subJetIdx1].p4().M()
-                    WHadreco = recosubjets[reco.subJetIdx2].p4()
-                    if recosubjets[reco.subJetIdx1].btagCSVV2 > self.minBDisc or recosubjets[reco.subJetIdx2].btagCSVV2 > self.minBDisc:
-                        self.SJ0isW = 0
-                if isMC and WHadreco != None and self.SJ0isW >= 0:
+        self.out.fillBranch("nSelMuons", len(muons))
+        self.out.fillBranch("nSelTaus", len(taus))
+        self.out.fillBranch("mvis", mvis)
+        self.out.fillBranch("ptvis", pt_vis)
 
-                    for q in realqs:
-                        gen_4v = ROOT.TLorentzVector()
-                        gen_4v.SetPtEtaPhiM(q.pt, q.eta, q.phi, q.mass)
-                        dR = WHadreco.DeltaR(gen_4v)
-                        if dR < 0.6:
-                            self.matchedSJ = 1
-            else:
-                recoAK8Groomed[reco] = None
-                WHadreco = None
+        ptmiss = Object(event, 'MET')
 
-        # now fill branches
-        if isMC:
-            self.out.fillBranch("genmatchedAK8Subjet", self.matchedSJ)
-            self.out.fillBranch("genmatchedAK8", self.isW)
-        self.out.fillBranch("AK8Subjet0isMoreMassive", self.SJ0isW)
-        self.out.fillBranch("dr_LepJet", dR_jetlep)
-        self.out.fillBranch("dphi_LepJet", jetAK8_4v.DeltaPhi(lepton))
-        self.out.fillBranch("dphi_MetJet", jetAK8_4v.DeltaPhi(MET))
-        self.out.fillBranch("dphi_WJet", jetAK8_4v.DeltaPhi(WcandLep))
-        self.out.fillBranch("Wlep_type", self.Vlep_type)
-        self.out.fillBranch("W_pt", WcandLep.Perp())
-        self.out.fillBranch("MET", met.sumEt)
-        self.out.fillBranch("SelectedJet_softDrop_mass", recoAK8[0].msoftdrop)
-        self.out.fillBranch("SelectedJet_pt", recoAK8[0].pt)
-        self.out.fillBranch("SelectedJet_eta", recoAK8[0].eta)
-        self.out.fillBranch("SelectedJet_mass", recoAK8[0].mass)
-        self.out.fillBranch("SelectedLepton_pt", lepton.Pt())
-        self.out.fillBranch("SelectedMuon_iso", iso)
-        if recoAK8[0].tau1 > 0.0:
-            tau21 = recoAK8[0].tau2/recoAK8[0].tau1
-        else:
-            tau21 = -1.
-        self.out.fillBranch("SelectedJet_tau21", tau21)
-        self.out.fillBranch("SelectedJet_tau21_ddt", tau21+0.063*ROOT.TMath.Log(recoAK8[0].msoftdrop**2/recoAK8[0].pt))
-        self.out.fillBranch("SelectedJet_tau21_ddt_retune", tau21+0.082*ROOT.TMath.Log(recoAK8[0].msoftdrop**2/recoAK8[0].pt))
-        if recoAK8[0].tau2 > 0.0:
-            tau32 = recoAK8[0].tau3/recoAK8[0].tau2
-        else:
-            tau32 = -1.
-        self.out.fillBranch("SelectedJet_tau32", tau32)
-        self.out.fillBranch("passedMETfilters", passedMETFilters)
+        l1.mt = calcMT(l1, ptmiss)
+        l2.mt = calcMT(l2, ptmiss)
+
+        self.fillBasic(l1, 1)
+        self.fillBasic(l2, 2)
+
+        for i_cand, cand in enumerate([l1, l2]):
+            if self.isMuon(cand):
+                self.fillMuon(cand, i_cand + 1)
+            if self.isTau(cand):
+                self.fillTau(cand, i_cand + 1)
+
+        pzeta_vis, pzeta_met, pzeta_disc = calcPzetaVars(l1, l2, ptmiss)
+
+        self.out.fillBranch("pzeta_vis", pzeta_vis)
+        self.out.fillBranch("pzeta_met", pzeta_met)
+        self.out.fillBranch("pzeta_disc", pzeta_disc)
+
+        other_taus = [tau for tau in taus if tau not in best_pair]
+        if other_taus:
+            l3 = other_taus[0]
+            l3.mt = calcMT(l3, ptmiss)
+            self.fillBasic(l3, 3)
+            self.fillTau(l3, 3)
 
         return True
 
 # define modules using the syntax 'name = lambda : constructor' to avoid having them loaded when not needed
-ttbar_semilep = lambda: Skimmer(Channel="mu")
+# ttbar_semilep = lambda: Skimmer()
