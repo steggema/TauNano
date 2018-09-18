@@ -36,9 +36,7 @@ s_mc = [
     Sample('ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8', 'ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8/RunIIFall17NanoAOD-PU2017_12Apr2018_94X_mc2017_realistic_v14-v1/NANOAODSIM', 80.95),
 ]
 
-
 def createSampleLists(analysis_dir='samples/', channel='mm', weight=''):
-
     tree_prod_name = ''
     samples_essential = []
 

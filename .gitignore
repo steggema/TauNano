@@ -11,6 +11,7 @@ Skimmer/python/__init__.py
 Analysis/python/__init__.py
 Plotting/python/__init__.py
 Analysis/python/plotting/__init__.py
+Analysis/python/samples/__init__.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

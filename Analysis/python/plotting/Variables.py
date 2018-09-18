@@ -33,7 +33,6 @@ generic_vars = [
     VCfg(name='pfmet_pt', binning={'nbinsx':60, 'xmin':0., 'xmax':300.}, unit='GeV', xtitle='E_{T}^{miss} (PF)'),
     VCfg(name='puppimet_pt', binning={'nbinsx':60, 'xmin':0., 'xmax':300.}, unit='GeV', xtitle='E_{T}^{miss} (Puppet)'),
     VCfg(name='met_sig', drawname='met_pt/sqrt(met_cov00 + met_cov11)', binning={'nbinsx':50, 'xmin':0., 'xmax':15.}, unit='GeV', xtitle='MVA E_{T}^{miss} significance'),
-    
     VCfg(name='vbf_mjj', binning={'nbinsx':40, 'xmin':0, 'xmax':1000.}, unit='GeV', xtitle='m_{jj}'),
     VCfg(name='vbf_deta', binning={'nbinsx':40, 'xmin':-7., 'xmax':7.}, unit=None, xtitle='#Delta#eta (VBF)'),
     VCfg(name='vbf_n_central', binning={'nbinsx':4, 'xmin':-0.5, 'xmax':3.5}, unit=None, xtitle='N_{central jets}'),
@@ -73,7 +72,6 @@ generic_vars = [
     VCfg(name='dil_pt', drawname="dil_pt", binning={'nbinsx':50, 'xmin':0, 'xmax':250.}, unit='GeV', xtitle='p_{T}^{l1+l2}'),
 
     VCfg(name='geninfo_nup', binning={'nbinsx':10, 'xmin':-0.5, 'xmax':9.5}, unit=None, xtitle='N_{partons}'),
-    
     VCfg(name='min_delta_phi_tau1tau2_met', drawname='min(min(abs(TVector2::Phi_mpi_pi(met_phi - l1_phi)), abs(TVector2::Phi_mpi_pi(met_phi - l2_phi))),min(abs(TVector2::Phi_mpi_pi(met_phi - jet1_phi))+100*(jet1_pt>40), abs(TVector2::Phi_mpi_pi(met_phi - jet2_phi))+100*(jet2_pt>40)))', binning={'nbinsx':32, 'xmin':0, 'xmax':3.2}, unit=None, xtitle='min(#Delta#Phi(E_{T}^{miss}, tau1/tau2)'),
 
     # VCfg(name='jet1_chargedHadronMultiplicity', binning={'nbinsx':40, 'xmin':-0.5, 'xmax':39.5}, unit=None, xtitle='jet 1 N_{CH}'),
@@ -110,7 +108,6 @@ electron_l1_vars = [
     VCfg(name='l1_nhits_missing', binning={'nbinsx':4, 'xmin':-0.5, 'xmax':3.5}, unit=None, xtitle='electron N(missing hits)'),
     VCfg(name='l1_eid_nontrigmva_loose', binning={'nbinsx':50, 'xmin':0.5, 'xmax':1.001}, unit=None, xtitle='electron non-triggering MVA'),
     VCfg(name='l1_eid', drawname='l1_eid_loose+l1_eid_medium+l1_eid_tight', binning={'nbinsx':4, 'xmin':-0.5, 'xmax':3.5}, unit=None, xtitle='cut-based ID'),
-    
 ]
 
 tau_l1_vars = [
@@ -275,7 +272,7 @@ emu_vars = generic_vars +electron_l1_vars + muon_l2_vars + mu_mu_special_vars + 
 
 tautau_vars = generic_vars + tau_l1_vars + tau_l2_vars + tau_tau_special_vars
 
-all_vars = generic_vars + muon_l1_vars + muon_l2_vars + tau_l2_vars + additional_tau_vars + tau_tau_special_vars + tau_mu_special_vars # + additional_tau_vars 
+all_vars = generic_vars + muon_l1_vars + muon_l2_vars + tau_l2_vars + additional_tau_vars + tau_tau_special_vars + tau_mu_special_vars # + additional_tau_vars
 
 
 dict_all_vars = {}
@@ -293,4 +290,3 @@ dict_channel_vars = {
 
 def getVars(names, channel='all'):
     return [dict_channel_vars[channel][n] for n in names]
-    

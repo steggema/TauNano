@@ -33,9 +33,9 @@ cut_HbbTight = 0.9
 cut_vbfDEta = 4.0
 cut_vbfMass = 400
 
-cat_lnujj_trigOrSF = "((HLT_MU||HLT_ELE||HLT_ISOMU||HLT_ISOELE||HLT_MET120)&&((run>2000*Flag_eeBadScFilter)+((run<2000)*lnujj_sf)))"
-cat_metFilters = "(((run>2000*Flag_eeBadScFilter)+(run<2000))&&Flag_goodVertices&&Flag_globalTightHalo2016Filter&&Flag_HBHENoiseFilter&&Flag_HBHENoiseIsoFilter&&Flag_eeBadScFilter&&Flag_EcalDeadCellTriggerPrimitiveFilter&&Flag_BadPFMuonFilter&&Flag_BadChargedCandidateFilter&&Flag_ecalBadCalibFilter)"
-cat_lnujj_basic = "(lnujj_nOtherLeptons==0&&lnujj_l2_softDrop_mass>0&&lnujj_LV_mass>{cut_mlnujj}&&((abs(lnujj_l1_l_pdgId)==11||(abs(lnujj_l1_l_pdgId)==13))))".format(cut_mlnujj=cut_mlnujj)
+cat_lnujj_trigOrSF = "((HLT_Mu50)+((run<2000)*1.))"
+cat_metFilters = "(passedMETfilters==0)"
+cat_lnujj_basic = "(FatJet_pt[0]>200)"
 cat_jj_basic = 'jj_nOtherLeptons==0&&((HLT_JJ*run>2000)+(run<2000))&&(jj_LV_mass>{cut_mjj}&&jj_l1_softDrop_mass>0&&jj_l2_softDrop_mass>0)'.format(cut_mjj=cut_mjj)
 
 cat_lnujj_mu = '(abs(lnujj_l1_l_pdgId)==13)'
