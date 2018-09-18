@@ -1,7 +1,5 @@
-import copy
 import socket
 from InsideWTop.Plotting.PlotConfigs import HistogramCfg
-from InsideWTop.Analysis.plotting.categories_VV_2017 import *
 from InsideWTop.Plotting.HistCreator import createHistograms
 from InsideWTop.Plotting.HistDrawer import HistDrawer
 from InsideWTop.Analysis.plotting.Variables import *
