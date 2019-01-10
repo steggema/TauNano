@@ -16,6 +16,10 @@ from InsideWTop.Skimmer.tools import calcMT, calcPzetaVars
 
 DEFAULT = -999
 
+# TODO:
+# - Add Met variables
+# - Add jet variables
+
 class Skimmer(Module):
     def __init__(self, is_data=False):
         self.out = None
@@ -25,7 +29,8 @@ class Skimmer(Module):
         self.basic_branch_names = ['pt', 'eta', 'phi', 'm', 'q', 'd0', 'dz', 'mt', 'dxy', 'dz'] #FIXME: int vars, like gen_match
         if not is_data:
             self.basic_branch_names.append('gen_match')
-        self.tau_branch_names = ['puCorr', 'rawAntiEle', 'rawIso', 'rawIsodR03', 'rawMVAnewDM2017v2', 'rawMVAoldDM', 'rawMVAoldDM2017v1', 'rawMVAoldDM2017v2', 'rawMVAoldDMdR032017v2', 'decayMode', 'idAntiEle', 'idAntiMu', 'idDecayMode', 'idMVAnewDM2017v2', 'idMVAoldDM', 'idMVAoldDM2017v1', 'idMVAoldDM2017v2', 'idMVAoldDMdR032017v2']
+        self.tau_branch_names = ['puCorr', 'rawAntiEle', 'rawIso', 'rawIsodR03',  'decayMode', 'idAntiEle', 'idAntiMu', 'idDecayMode']
+        # 'idMVAnewDM2017v2', 'idMVAoldDM', 'idMVAoldDM2017v1', 'idMVAoldDM2017v2', 'idMVAoldDMdR032017v2''rawMVAnewDM2017v2', 'rawMVAoldDM', 'rawMVAoldDM2017v1', 'rawMVAoldDM2017v2', 'rawMVAoldDMdR032017v2',
         self.muon_branch_names = [] if is_data else ['effSF']
 
         self.translater = {
@@ -118,7 +123,7 @@ class Skimmer(Module):
     def selectTau(tau):
         '''Select muon passing analysis criteria, without isolation
         '''
-        tau.iso = tau.rawMVAoldDM2017v2
+        tau.iso = -tau.rawIso
         return tau.pt > 20. and abs(tau.eta) < 2.3 and tau.idDecayMode and tau.dz < 0.2
 
     @staticmethod
@@ -129,8 +134,6 @@ class Skimmer(Module):
 
     def analyze(self, event):
         """process event, return True (go to next module) or False (fail, go to next event)"""
-
-        self.fillMETFilterDecision(event)
 
         # MUONS
         muons = Collection(event, 'Muon')
@@ -159,6 +162,8 @@ class Skimmer(Module):
         for branch_name in self.out._branches:
             if branch_name not in self.no_reset_branches:
                 self.out.fillBranch(branch_name, DEFAULT)
+
+        self.fillMETFilterDecision(event)
 
         best_pair = self.bestPair(all_pairs)
 

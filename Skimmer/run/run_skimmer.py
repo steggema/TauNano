@@ -3,7 +3,9 @@
 from argparse import ArgumentParser
 from PhysicsTools.NanoAODTools.postprocessing.framework.postprocessor import PostProcessor
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.lepSFProducer import muonSF2017
-from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import puAutoWeight
+from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import puAutoWeight2018
+# from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2017
+
 from InsideWTop.Skimmer.skimmer import Skimmer
 
 # need to keep this for grid-control
@@ -36,9 +38,10 @@ keepDropFile = args.keepDropFile
 
 cuts = '&&'.join(['({})'.format(cut) for cut in cut_dict.values()])
 
-modules = [Skimmer(args.isdata)] if args.isdata else [muonSF2017(), Skimmer(), puAutoWeight()]
+# jetmetUncertainties2017(),
+modules = [Skimmer(args.isdata)] if args.isdata else [muonSF2017(),  Skimmer(), puAutoWeight2018()]
 
-jsonInput = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions17/13TeV/ReReco/Cert_294927-306462_13TeV_EOY2017ReReco_Collisions17_JSON.txt' if args.isdata else None
+jsonInput = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions18/13TeV/PromptReco/Cert_314472-325175_13TeV_PromptReco_Collisions18_JSON.txt' if args.isdata else None
 
 p = PostProcessor(outputDir, inFiles, cuts, outputbranchsel=keepDropFile,
                   modules=modules, provenance=False, fwkJobReport=False,
