@@ -80,11 +80,11 @@ class HistDrawer:
         pad.cd()
         year, lumi, energy, unit = HistDrawer.datasetInfo(plot)
         theStr = '{lumi:3.3} {unit}^{{-1}} ({energy:d} TeV)'.format(year=year, unit=unit, lumi=lumi, energy=energy)
-        # CMS_lumi(pad, theStr, iPosX=0, writeExtraText=writeExtraText, extraText=extraText)  # CMS outside canvas
-        if legend == 'right':
-            CMS_lumi(pad, theStr, iPosX=10, writeExtraText=writeExtraText, extraText=extraText)
-        else:
-            CMS_lumi(pad, theStr, iPosX=13, writeExtraText=writeExtraText, extraText=extraText)
+        CMS_lumi(pad, theStr, iPosX=0, writeExtraText=writeExtraText, extraText=extraText)  # CMS outside canvas
+        # if legend == 'right':
+        #     CMS_lumi(pad, theStr, iPosX=10, writeExtraText=writeExtraText, extraText=extraText)
+        # else:
+        #     CMS_lumi(pad, theStr, iPosX=13, writeExtraText=writeExtraText, extraText=extraText)
 
 
         lowY = 0.68
@@ -216,8 +216,8 @@ class HistDrawer:
         # blinding
         if blindxmin or blindxmax:
             pad.cd()
-            max = plot.stack.totalHist.GetMaximum()
-            box = TBox(blindxmin, 0,  blindxmax, max)
+            b_max = plot.stack.totalHist.GetMaximum()
+            box = TBox(blindxmin, 0, blindxmax, b_max)
             box.SetFillColor(1)
             box.SetFillStyle(3004)
             box.Draw()
@@ -233,12 +233,12 @@ class HistDrawer:
         can.SaveAs(plotname + '.pdf')
 
         # Also save with log y
-        if plot.legendPos == 'right':
-            h.GetYaxis().SetRangeUser(0.1001, pad.GetUymax() * 5.)
-        else:
-            # minimum is set to 2 orders of magnitude lower than maximum
-            minRange = pow(10, floor(log10(pad.GetUymax()/100.)))
-            h.GetYaxis().SetRangeUser(minRange + minRange*1e-4, pad.GetUymax() * 5.e3)
+        # if plot.legendPos == 'right':
+        #     h.GetYaxis().SetRangeUser(0.1001, pad.GetUymax() * 5.)
+        # else:
+        #     # minimum is set to 2 orders of magnitude lower than maximum
+        minRange = pow(10, floor(log10(pad.GetUymax()/100.)))
+        h.GetYaxis().SetRangeUser(minRange + minRange*1e-4, pad.GetUymax() * 2.e3)
         pad.SetLogy(True)
         can.SaveAs(plotname + '_log.png')
         can.SaveAs(plotname + '_log.pdf')

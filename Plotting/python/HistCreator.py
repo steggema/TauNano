@@ -9,7 +9,7 @@ from InsideWTop.Plotting.DataMCPlot import DataMCPlot
 
 from InsideWTop.Plotting.Histogram import Histogram
 
-from ROOT import TH1F, TGraphAsymmErrors, Math, kBlack
+from ROOT import TH1F, TFile, TGraphAsymmErrors, Math, kBlack
 
 
 def initHist(hist, vcfg):
@@ -42,13 +42,13 @@ def createHistograms(hist_cfg, all_stack=False, verbose=False, friend_func=None)
             for vcfg in vcfgs:
                 hist = hists[vcfg.name]
                 plot = plots[vcfg.name]
-                hist._BuildStack(hist._SortedHistograms(), ytitle=cfg.ytitle)
+                hist._BuildStack(hist._SortedHistograms(), ytitle='Events')
 
                 total_hist = plot.AddHistogram(cfg.name, hist.stack.totalHist.weighted, stack=True)
 
                 if cfg.norm_cfg is not None:
                     norm_hist = createHistogram(cfg.norm_cfg, all_stack=True)
-                    norm_hist._BuildStack(norm_hist._SortedHistograms(), ytitle=cfg.ytitle)
+                    norm_hist._BuildStack(norm_hist._SortedHistograms(), ytitle='Events')
                     total_hist.Scale(hist.stack.integral/total_hist.Yield())
 
                 if cfg.total_scale is not None:
@@ -80,6 +80,8 @@ def createHistograms(hist_cfg, all_stack=False, verbose=False, friend_func=None)
             if hist_cfg.weight:
                 norm_cut = '({c}) * {we}'.format(c=norm_cut, we=weight)
                 shape_cut = '({c}) * {we}'.format(c=shape_cut, we=weight)
+
+            print hist_cfg.name, norm_cut, shape_cut
 
             # Initialise all hists before the multidraw
             hists = {}
@@ -170,7 +172,7 @@ def createHistogram(hist_cfg, all_stack=False, verbose=False, friend_func=None):
 
             initHist(hist, vcfg)
 
-            file_name = '/'.join([cfg.ana_dir, cfg.dir_name, cfg.tree_prod_name, 'tree.root'])
+            file_name = cfg.ana_dir+"/"+cfg.dir_name+".root"
 
             ttree = plot.readTree(file_name, cfg.tree_name, verbose=verbose, friend_func=friend_func)
 
@@ -220,14 +222,16 @@ def setSumWeights(sample):
     if isinstance(sample, HistogramCfg) or sample.is_data:
         return
 
-    pckfile = '/'.join([sample.ana_dir, sample.dir_name])+'.pck'
+    root_file = '/'.join([sample.ana_dir, sample.dir_name])+'.root'
     try:
-        pckobj = pickle.load(open(pckfile, 'r'))
-        weightinv = float(pckobj['events'])
-        sample.sumweights = weightinv
+        tfile = TFile(root_file)
+        sum_weights = 0.
+        runs = tfile.Get('Runs')
+        for run in runs:
+            sum_weights += run.genEventSumw
+        sample.sumweights = sum_weights
     except IOError:
         print 'Warning: could not find sum weights information for sample', sample.name
-        pass
 
 
 def convertToPoisson(h):

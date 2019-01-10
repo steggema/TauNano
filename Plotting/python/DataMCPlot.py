@@ -7,8 +7,8 @@ from ROOT import TLegend, TLine, TPad, TFile, gROOT, TH1
 from InsideWTop.Plotting.Histogram import Histogram
 from InsideWTop.Plotting.Stack import Stack
 
-# from CMGTools.H2TauTau.proto.plotter.H2TauStyle import histPref, Style
-from InsideWTop.Analysis.plotting.VVStyle import histPref, Style
+# from InsideWTop.Analysis.plotting.VVStyle import histPref, Style
+from InsideWTop.Analysis.plotting.H2TauStyle import histPref, Style
 
 
 def ymax(hists):
@@ -528,7 +528,6 @@ class DataMCPlot(object):
         '''build a stack from a list of Histograms.
 
         The histograms for which Histogram.stack is False are put in self.nostack'''
-        self.stack = None
         self.stack = Stack(self.name+'_stack', ytitle=ytitle)
         self.nostack = []
         for hist in hists:
