@@ -95,6 +95,8 @@ histPref['data_*'] = {'style':sData, 'layer':2999, 'legend':'Observed'}
 histPref['ZTT*'] = {'style':sHTT_DYJets, 'layer':4, 'legend':'Z#rightarrow#tau#tau'}
 histPref['embed_*'] = {'style':sViolet, 'layer':4.1, 'legend':None}
 histPref['TT'] = {'style':sHTT_TTJets, 'layer':1, 'legend':'t#bar{t}'} 
+histPref['TTJets*'] = {'style':sHTT_TTJets, 'layer':1, 'legend':'t#bar{t}'} 
+histPref['Top'] = {'style':sHTT_TTJets, 'layer':1, 'legend':'Top'} 
 histPref['T*tW*'] = {'style':sHTT_TTJets, 'layer':1, 'legend':'Single t'} 
 histPref['TTo*'] = {'style':sHTT_TTJets, 'layer':1, 'legend':'Single t'} 
 histPref['TBarTo*'] = {'style':sHTT_TTJets, 'layer':1, 'legend':'Single t'} 
@@ -123,4 +125,4 @@ histPref['HiggsVBF125'] = {'style':sHTT_Higgs2, 'layer':1001, 'legend':'H_{125}#
 histPref['ggH*'] = {'style':sHTT_Higgs, 'layer':1001, 'legend':None}
 histPref['bbH*'] = {'style':sHTT_Higgs, 'layer':1001, 'legend':None}
 histPref['SMS*'] = {'style':sHTT_Higgs, 'layer':1001, 'legend':None}
-
+histPref['DY*'] = {'style':sHTT_ZL, 'layer':3.2, 'legend':'Z#rightarrow ll'}

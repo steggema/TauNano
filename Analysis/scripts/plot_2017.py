@@ -1,9 +1,11 @@
-import socket
 from InsideWTop.Plotting.PlotConfigs import HistogramCfg
 from InsideWTop.Plotting.HistCreator import createHistograms
 from InsideWTop.Plotting.HistDrawer import HistDrawer
-from InsideWTop.Analysis.plotting.Variables import *
+from InsideWTop.Analysis.plotting.Variables import mumu_vars, taumu_vars
 from InsideWTop.Analysis.plotting.Samples_2017 import createSampleLists
+
+from InsideWTop.Analysis.plotting.qcdEstimationMSSMltau import estimateQCDWMSSM, createQCDWHistograms
+
 # from InsideWTop.H2TauTau.proto.plotter.helper_methods import plotDataOverMCEff
 
 # always cut on category, otherwise normalisation is off!
@@ -11,102 +13,56 @@ total_weight = '1.'
 
 print 'Total weight:', total_weight
 
-weight_MC = "1."  # "genWeight * puWeight"
+# channels = ['mt']
+channels = ['mm']
 
 int_lumi = 41368
+r_qcd_os_ss = 1.17
 
 cuts = {}
+cuts['mm'] = {'inclusive':'nSelMuons >= 2 && mvis > 50. && pt_1 > 29. && HLT_IsoMu27'}
+cuts['mt'] = {'inclusive':'nSelMuons == 1 && pt_1 > 29. && HLT_IsoMu27 && pt_2 > 30. && idMVAoldDM2017v2_2 & 32 && idDecayMode_2==1 && idAntiMu_2 & 2 && idAntiEle_2 & 1 && q_1 != q_2'}
 
-# if adding additional cuts, join with * and not &&, e.g.
-# inc_cut = '*'.join([lnujj_inc])
-# cuts['lnujj_Inclusive'] = categories["lnujj_Inclusive"]
-
-# (HLT_JJ>0&&njj>0&&Flag_goodVertices&&Flag_HBHENoiseFilter&&Flag_HBHENoiseIsoFilter&&Flag_eeBadScFilter&&jj_LV_mass>1000&&abs(jj_l1_eta-jj_l2_eta)<1.3&&jj_l1_softDrop_mass>0.&&jj_l2_softDrop_mass>0.)
-
-qcdKFac = 0.7
-cutDDT = 0.57
-cutDDT_LP = 0.98
-
-cuts['jj'] = lnujj_inc_basic
-# cuts['jj_l1_V'] = cuts['jj'] + "&&(jj_l1_softDrop_mass>55&&jj_l1_softDrop_mass<105)"
-# cuts['jj_l2_V'] = cuts['jj'] + "&&(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<105)"
-# cuts['jj_l1_V_HP'] = cuts['jj'] + "&&(jj_l1_softDrop_mass>55&&jj_l1_softDrop_mass<105&&jj_l1_tau21_DDT<{})".format(cutDDT)
-# cuts['jj_l2_V_HP'] = copy.deepcopy(cuts['jj']) + "&&(jj_l2_softDrop_mass>55&&jj_l2_softDrop_mass<105&&jj_l2_tau21_DDT<{})".format(cutDDT)
-# l1_LP = "&&(jj_l1_tau21_DDT>{}&&jj_l1_tau21_DDT<{})".format(cutDDT, cutDDT_LP)
-# l2_LP = "&&(jj_l2_tau21_DDT>{}&&jj_l2_tau21_DDT<{})".format(cutDDT, cutDDT_LP)
-# l1_NP = "&&(jj_l1_tau21_DDT>{})".format(cutDDT_LP)
-# l2_NP = "&&(jj_l2_tau21_DDT>{})".format(cutDDT_LP)
-# cuts['jj_l1_LP'] = cuts['jj'] + l1_LP
-# cuts['jj_l2_LP'] = cuts['jj'] + l2_LP
-# cuts['jj_l1_NP'] = cuts['jj'] + l1_NP
-# cuts['jj_l2_NP'] = cuts['jj'] + l2_NP
-# cuts['jj_LP'] = cuts['jj'] + l1_LP + l2_LP
-# cuts['jj_NP'] = cuts['jj'] + l1_NP + l2_NP
-
-# del cuts['jj']
-
-# cuts['lnujj_mu'] = findCut(categories, cat="lnujj", lep="mu")
-# cuts['lnujj_e'] = findCut(categories, cat="lnujj", lep="e")
-# cuts['lnujj_ttbar_mu_b'] = findCut(categories, cat="lnujj", lep="mu", reg="b")
-# cuts['lnujj_ttbar_e_b'] = findCut(categories, cat="lnujj", lep="e", reg="b")
-# cuts['lnujj_mu_nob'] = findCut(categories, cat="lnujj", lep="mu", reg="nob")
-# cuts['lnujj_e_nob'] = findCut(categories, cat="lnujj", lep="e", reg="nob")
-# cuts['lnujj_e_veto_mV_nob'] = findCut(categories, cat="lnujj", lep="e", mJ="VetoV", reg="nob")
-# cuts['lnujj_mu_veto_mV_nob'] = findCut(categories, cat="lnujj", lep="mu", mJ="VetoV", reg="nob")
-# cuts['lnujj_ttbar_mu_SP_b'] = findCut(categories, cat="lnujj", lep="mu", tau21="SP", reg="b")
-# cuts['lnujj_ttbar_e_SP_b'] = findCut(categories, cat="lnujj", lep="e", tau21="SP", reg="b")
-# cuts['lnujj_ttbar_mu_mV_b'] = findCut(categories, cat="lnujj", lep="mu", mJ="V", reg="b")
-# cuts['lnujj_ttbar_e_mV_b'] = findCut(categories, cat="lnujj", lep="e", mJ="V", reg="b")
-# cuts['lnujj_mu_SP_veto_mV'] = findCut(categories, cat="lnujj", lep="mu", tau21="SP", mJ="VetoV")
-# cuts['lnujj_e_SP_veto_mV'] = findCut(categories, cat="lnujj", lep="e", tau21="SP", mJ="VetoV")
-# cuts['lnujj_e_HP_veto_mV_nob'] = findCut(categories, cat="lnujj", lep="e", tau21="HP", mJ="VetoV", reg="nob")
-# cuts['lnujj_mu_HP_veto_mV_nob'] = findCut(categories, cat="lnujj", lep="mu", tau21="HP", mJ="VetoV", reg="nob")
-# cuts['lnujj_e_HP_veto_mV'] = findCut(categories, cat="lnujj", lep="e", tau21="HP", mJ="VetoV")
-# cuts['lnujj_mu_HP_veto_mV'] = findCut(categories, cat="lnujj", lep="mu", tau21="HP", mJ="VetoV")
-# cuts['lnujj_ttbar_e_HP_b'] = findCut(categories, cat="lnujj", lep="e", tau21="HP", reg="b")
-# cuts['lnujj_ttbar_mu_HP_b'] = findCut(categories, cat="lnujj", lep="mu", tau21="HP", reg="b")
-
+weights = {}
+weights['mm'] = "genWeight * puWeight * effSF_1 * effSF_2"
+weights['mt'] = "genWeight * puWeight * effSF_1"
 
 # -> Command line
-analysis_dir = '/eos/cms/store/cmst3/group/exovv/clange/InsideWTop/Skims/'
-if socket.gethostname().find("uzhcms1") >= 0:
-    analysis_dir = '/data/clange/ntuples/2017_JEC_V6/'
+analysis_dir = '/eos/cms/store/cmst3/group/htautau/NanoAOD/Skims/'
 print "Analysis dir:", analysis_dir
-tree_prod_name = ''
 
-samples_mc, samples_data, samples, all_samples, sampleDict = createSampleLists(analysis_dir, channel='WV', weight=weight_MC, qcdKFac=qcdKFac)
+variables = {}
+variables['mm'] = mumu_vars
+variables['mt'] = taumu_vars
 
-# Taken from Variables.py, can get subset with e.g. getVars(['mt', 'mvis'])
-variables = generic_vars # + jj_vars + jj_l1_jetid + jj_l2_jetid
-# variables = [lnujj_vars[0]]
-# variables = getVars(['l1_reliso05', 'l2_reliso05'])
-# variables = [
-#     VariableCfg(name='mvis', binning={'nbinsx':35, 'xmin':0, 'xmax':350}, unit='GeV', xtitle='m_{vis}')
-# ]
+for channel in channels:
+    for cut_name, cut in cuts[channel].items():
+        hist_dict = {}
+        samples_mc, samples_data, samples, all_samples, sampleDict = createSampleLists(analysis_dir, weight=weights[channel], channel=channel)
+        if channel == 'mt':
+            samples = createQCDWHistograms(samples, hist_dict, int_lumi, weight=total_weight, r_qcd_os_ss=r_qcd_os_ss)
 
-for cut_name in cuts:
+        cfg_example = HistogramCfg(name='example', var=None, cfgs=samples, cut=cut, lumi=int_lumi, weight=total_weight)
 
-    cfg_example = HistogramCfg(name='example', var=None, cfgs=samples, cut='', lumi=int_lumi, weight=total_weight)
+        print cfg_example.cut
+        cfg_example.vars = variables[channel]
 
-    cfg_example.cut = cuts[cut_name]
-    print cfg_example.cut
-    cfg_example.vars = variables
+        if channel == 'mt':
+            estimateQCDWMSSM(hist_dict, cut, mt_cut='(mt_1<40)', r_qcd_os_ss=r_qcd_os_ss, vars=variables[channel])
 
-    channel = ""
-    # channel = "jj"
-    # if cut_name.find("HP") >= 0:
-    #     channel += " HP"
-    # elif cut_name.find("LP") >= 0:
-    #     channel += " LP"
+        plots = createHistograms(cfg_example, verbose=False)
+        for variable in variables[channel]:
+            plot = plots[variable.name]
+            # plot.Group('Diboson', ['WWTo1L1Nu2Q', 'WWTo1L1Nu2Q', 'WZTo1L1Nu2Q'])
+            plot.Group('Top', ['TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8', 'TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8',
+                               'ST_t-channel_antitop_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8',
+                               'ST_t-channel_top_4f_inclusiveDecays_TuneCP5_13TeV-powhegV2-madspin-pythia8',
+                               'ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8',
+                               'ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8'])
+            plot.Group('WJets', ['W1JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8', 'W2JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8', 'W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8', 'W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8'])
+            plot.Group('Diboson', ['WW_TuneCP5_13TeV-pythia8', 'WZ_TuneCP5_13TeV-pythia8', 'ZZ_TuneCP5_13TeV-pythia8'])
+            plot.Group('ZLL', ['DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_ext1', 'DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8', 'DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8_comb'])
 
-    plots = createHistograms(cfg_example, verbose=False)
-    for variable in variables:
-        plot = plots[variable.name]
-        # plot.Group('Diboson', ['WWTo1L1Nu2Q', 'WWTo1L1Nu2Q', 'WZTo1L1Nu2Q'])
-        plot.Group('Top', ['TT_TuneCUETP8M2T4_13TeV-powheg-pythia8'])
-        # plot.Group('WJets', ['WJetsToQQ_HT800toInf'])
-        # plot.Group('ZJets', ['ZJetsToQQ_HT800toInf'])
-        # plot.Group('QCD', ['QCD_HT100to200', 'QCD_HT200to300', 'QCD_HT300to500', 'QCD_HT500to700', 'QCD_HT700to1000', 'QCD_HT1000to1500', 'QCD_HT1500to2000', 'QCD_HT2000toInf'])
-        plot.Group('data_obs', ['data_SingleMuon', 'data_SingleElectron'])
-        HistDrawer.draw(plot, plot_dir='plots_jj/'+cut_name, channel=channel)
-        # plot.WriteDataCard(filename='datacard_mm.root', dir='mm_' + cut_name)
+            plot.Group('data_obs', ['data'])
+            HistDrawer.draw(plot, plot_dir='plots_{}/{}'.format(channel, cut_name), channel=channel)
+            # plot.WriteDataCard(filename='datacard_mm.root', dir='mm_' + cut_name)
