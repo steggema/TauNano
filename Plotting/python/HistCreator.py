@@ -1,13 +1,13 @@
 import pickle
 
 # Adds MultiDraw method to ROOT.TTree
-import InsideWTop.Plotting.MultiDraw
+import TauNano.Plotting.MultiDraw
 
-from InsideWTop.Plotting.PlotConfigs import HistogramCfg
-from InsideWTop.Plotting.DataMCPlot import DataMCPlot
+from TauNano.Plotting.PlotConfigs import HistogramCfg
+from TauNano.Plotting.DataMCPlot import DataMCPlot
 
 
-from InsideWTop.Plotting.Histogram import Histogram
+from TauNano.Plotting.Histogram import Histogram
 
 from ROOT import TH1F, TFile, TGraphAsymmErrors, Math, kBlack
 

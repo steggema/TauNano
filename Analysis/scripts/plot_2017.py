@@ -1,12 +1,12 @@
-from InsideWTop.Plotting.PlotConfigs import HistogramCfg
-from InsideWTop.Plotting.HistCreator import createHistograms
-from InsideWTop.Plotting.HistDrawer import HistDrawer
-from InsideWTop.Analysis.plotting.Variables import mumu_vars, taumu_vars
-from InsideWTop.Analysis.plotting.Samples_2017 import createSampleLists
+from TauNano.Plotting.PlotConfigs import HistogramCfg
+from TauNano.Plotting.HistCreator import createHistograms
+from TauNano.Plotting.HistDrawer import HistDrawer
+from TauNano.Analysis.plotting.Variables import mumu_vars, taumu_vars
+from TauNano.Analysis.plotting.Samples_2017 import createSampleLists
 
-from InsideWTop.Analysis.plotting.qcdEstimationMSSMltau import estimateQCDWMSSM, createQCDWHistograms
+from TauNano.Analysis.plotting.qcdEstimationMSSMltau import estimateQCDWMSSM, createQCDWHistograms
 
-# from InsideWTop.H2TauTau.proto.plotter.helper_methods import plotDataOverMCEff
+# from TauNano.H2TauTau.proto.plotter.helper_methods import plotDataOverMCEff
 
 # always cut on category, otherwise normalisation is off!
 total_weight = '1.'

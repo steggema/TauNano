@@ -145,7 +145,7 @@ def MultiDraw(self, Formulae, CommonWeight="1"):
     except ImportError:
         # gROOT.ProcessLine(".L %sMultiDraw.cxx+O" % "./")
         if "/sMultiDraw_cc.so" not in gSystem.GetLibraries():
-            gROOT.ProcessLine(".L %s/src/InsideWTop/Plotting/python/MultiDraw.cc+" % os.environ['CMSSW_BASE']);
+            gROOT.ProcessLine(".L %s/src/TauNano/Plotting/python/MultiDraw.cc+" % os.environ['CMSSW_BASE']);
         from ROOT import MultiDraw as _MultiDraw
 
     # from time import time

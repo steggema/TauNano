@@ -1,6 +1,6 @@
-from InsideWTop.Plotting.PlotConfigs import VariableCfg as VCfg
+from TauNano.Plotting.PlotConfigs import VariableCfg as VCfg
 
-from  InsideWTop.Analysis.plotting.binning import binning_svfitMass_finer, binning_mttotal, binning_mttotal_fine
+from  TauNano.Analysis.plotting.binning import binning_svfitMass_finer, binning_mttotal, binning_mttotal_fine
 
 generic_vars = [
     VCfg(name='_norm_', drawname='1.', binning={'nbinsx':5, 'xmin':-1.5, 'xmax':3.5}, unit='', xtitle='Normalisation'),

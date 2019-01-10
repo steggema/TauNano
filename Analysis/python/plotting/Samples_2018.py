@@ -1,6 +1,6 @@
-from InsideWTop.Plotting.PlotConfigs import SampleCfg
-from InsideWTop.Plotting.HistCreator import setSumWeights
-from InsideWTop.Plotting.samples.RunIIFall18NanoAOD import s_data, s_mc
+from TauNano.Plotting.PlotConfigs import SampleCfg
+from TauNano.Plotting.HistCreator import setSumWeights
+from TauNano.Plotting.samples.RunIIFall18NanoAOD import s_data, s_mc
 
 
 def createSampleLists(analysis_dir='samples/', weight='', channel='mm'):

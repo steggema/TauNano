@@ -1,8 +1,8 @@
 from copy import deepcopy
 
-from InsideWTop.Plotting.PlotConfigs import HistogramCfg, VariableCfg
-from InsideWTop.Plotting.HistCreator import createHistogram
-from InsideWTop.Analysis.plotting.defaultGroups import createDefaultGroups
+from TauNano.Plotting.PlotConfigs import HistogramCfg, VariableCfg
+from TauNano.Plotting.HistCreator import createHistogram
+from TauNano.Analysis.plotting.defaultGroups import createDefaultGroups
 
 def createQCDWHistograms(samples, hist_dict, int_lumi, weight, r_qcd_os_ss=1.17):
     w_names = ['WJetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8', 'W1Jets', 'W2Jets', 'W3Jets', 'W4Jets']

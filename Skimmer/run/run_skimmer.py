@@ -6,7 +6,7 @@ from PhysicsTools.NanoAODTools.postprocessing.modules.common.lepSFProducer impor
 from PhysicsTools.NanoAODTools.postprocessing.modules.common.puWeightProducer import puAutoWeight2018
 # from PhysicsTools.NanoAODTools.postprocessing.modules.jme.jetmetUncertainties import jetmetUncertainties2017
 
-from InsideWTop.Skimmer.skimmer import Skimmer
+from TauNano.Skimmer.skimmer import Skimmer
 
 # need to keep this for grid-control
 # @FILE_NAMES@

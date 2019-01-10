@@ -12,7 +12,7 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 from PhysicsTools.NanoAODTools.postprocessing.tools import deltaR2
 from PhysicsTools.NanoAODTools.postprocessing.framework.eventloop import Module
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection, Object
-from InsideWTop.Skimmer.tools import calcMT, calcPzetaVars
+from TauNano.Skimmer.tools import calcMT, calcPzetaVars
 
 DEFAULT = -999
 

@@ -1,6 +1,6 @@
 import copy
 from ROOT import THStack, gPad, kGray
-from InsideWTop.Plotting.Style import sBlue,sBlack
+from TauNano.Plotting.Style import sBlue,sBlack
 
 class Stack:
     '''Attempt to overcome the deficiencies of the THStack class.

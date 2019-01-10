@@ -1,4 +1,4 @@
-from InsideWTop.Plotting.samples.Sample import Sample
+from TauNano.Plotting.samples.Sample import Sample
 
 s_data = [
 

@@ -1,4 +1,4 @@
-from InsideWTop.Plotting.samples.Sample import Sample
+from TauNano.Plotting.samples.Sample import Sample
 
 s_data = [
     Sample('SingleMuon_Run2017B_json', '/SingleMuon/Run2017B-31Mar2018-v1/NANOAOD'),

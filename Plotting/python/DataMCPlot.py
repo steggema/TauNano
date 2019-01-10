@@ -4,11 +4,11 @@ import fnmatch
 
 from ROOT import TLegend, TLine, TPad, TFile, gROOT, TH1
 
-from InsideWTop.Plotting.Histogram import Histogram
-from InsideWTop.Plotting.Stack import Stack
+from TauNano.Plotting.Histogram import Histogram
+from TauNano.Plotting.Stack import Stack
 
-# from InsideWTop.Analysis.plotting.VVStyle import histPref, Style
-from InsideWTop.Analysis.plotting.H2TauStyle import histPref, Style
+# from TauNano.Analysis.plotting.VVStyle import histPref, Style
+from TauNano.Analysis.plotting.H2TauStyle import histPref, Style
 
 
 def ymax(hists):

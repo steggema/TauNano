@@ -2,7 +2,7 @@ import ROOT
 import sys
 from array import array
 import pickle
-from InsideWTop.Plotting.PlotterBase import PlotterBase
+from TauNano.Plotting.PlotterBase import PlotterBase
 class MergedPlotter(PlotterBase):
 
     def __init__(self,plotters):
